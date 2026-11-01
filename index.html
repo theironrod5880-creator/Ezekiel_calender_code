@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vault Tutor — Iron Rod (S1)</title>
+<style>
+  :root { color-scheme: dark; }
+  body { font-family: system-ui, sans-serif; margin: 0; padding: 16px 16px 120px;
+         background: #111; color: #eee; line-height: 1.45; }
+  h1 { font-size: 1.15rem; margin: 0 0 4px; }
+  h2 { font-size: .95rem; margin: 22px 0 8px; text-transform: uppercase;
+       letter-spacing: .06em; color: #9ab; }
+  .core-badge { display: inline-block; background: #143; border: 1px solid #2a7; 
+                color: #9fd; font-size: .75rem; padding: 2px 8px; border-radius: 4px; 
+                margin-bottom: 12px; text-transform: uppercase; letter-spacing: .05em; font-weight: bold; }
+  .limits { border: 1px solid #653; background: #1c1410; padding: 10px 12px;
+            border-radius: 6px; font-size: .85rem; }
+  .limits ul { margin: 6px 0 0; padding-left: 18px; }
+  .limits li { margin-bottom: 4px; }
+  .card { border: 1px solid #333; border-radius: 6px; padding: 12px;
+          margin-bottom: 10px; background: #181818; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  button { font: inherit; padding: 7px 12px; border-radius: 5px;
+           border: 1px solid #555; background: #222; color: #eee; cursor: pointer; }
+  button:disabled { opacity: .38; cursor: not-allowed; }
+  button.ok { border-color: #2a7; }
+  button.warn { border-color: #864; color: #fd9; }
+  button.danger { border-color: #743; color: #fbb; }
+  input, select, textarea { width: 100%; box-sizing: border-box; font: inherit;
+       padding: 7px 8px; border-radius: 5px; border: 1px solid #444;
+       background: #0c0c0c; color: #eee; margin-bottom: 8px; }
+  label.lbl { display: block; font-size: .78rem; color: #9ab; margin-bottom: 3px; }
+  .muted { color: #888; font-size: .8rem; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+  .tab { flex: 1; padding: 8px 4px; text-align: center; font-size: .85rem;
+         border: 1px solid #333; border-radius: 5px; background: #151515;
+         color: #aaa; cursor: pointer; }
+  .tab.active { background: #223; color: #cfe; border-color: #4a6; }
+  .hidden { display: none; }
+  .prog { height: 6px; background: #222; border-radius: 3px; overflow: hidden;
+          margin-bottom: 10px; }
+  .bar { height: 100%; background: #2a7; width: 0; transition: width .2s; }
+  .step-head { display: flex; justify-content: space-between;
+               align-items: baseline; gap: 8px; }
+  .step-title { font-weight: 600; font-size: 1rem; }
+  .count { font-size: .75rem; color: #9ab; white-space: nowrap; }
+  .blk { margin: 8px 0; font-size: .88rem; }
+  .blk b { color: #9ab; font-size: .72rem; text-transform: uppercase;
+           letter-spacing: .06em; display: block; margin-bottom: 2px; }
+  .pad { display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+         border: 1px dashed #345; border-radius: 6px; padding: 10px;
+         background: #0e1418; margin-top: 8px; }
+  .pad button { font-size: .8rem; padding: 9px 6px; }
+  .ai-out { margin-top: 10px; padding: 10px; border-radius: 6px;
+            background: #0e1418; border: 1px solid #2a4; font-size: .86rem;
+            white-space: pre-wrap; }
+  .ai-out.err { border-color: #743; background: #1a1010; color: #fbb; }
+  #log { font-family: ui-monospace, monospace; font-size: .76rem;
+         background: #0b0b0b; border: 1px solid #333; border-radius: 6px;
+         padding: 10px; max-height: 200px; overflow: auto; white-space: pre-wrap; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+         background: #555; margin-right: 6px; vertical-align: middle; }
+  .dot.on { background: #2c7; }
+  .dot.bad { background: #c43; }
+  .prov-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .prov { border: 1px solid #333; border-radius: 6px; padding: 9px 10px;
+          background: #151515; cursor: pointer; }
+  .prov.sel { border-color: #4a6; background: #1a2620; }
+  .prov .pname { font-weight: 600; font-size: .9rem; }
+  .prov .porg { font-size: .72rem; color: #8a9; }
+  .prov .pnote { font-size: .72rem; color: #777; margin-top: 3px; }
+  .spot-ring { position: fixed; z-index: 9998; pointer-events: none;
+     border-radius: 8px; box-shadow: 0 0 0 3px #6cf, 0 0 0 9999px rgba(0,0,0,.62);
+     transition: all .15s ease; }
+  .spot-bubble { position: fixed; z-index: 9999; background: #16222c;
+     border: 1px solid #6cf; border-radius: 8px; padding: 10px 12px;
+     font-size: .85rem; box-shadow: 0 8px 24px rgba(0,0,0,.6); }
+  .spot-bubble .row { margin-top: 8px; justify-content: flex-end; }
+</style>
+</head>
+<body>
+
+<div class="core-badge">MERGE ACTIVE: MASTERCORE — THE IRON ROD (S1)</div>
+<h1>Vault Tutor — E0 Locked</h1>
+<p class="muted">Human-controlled. Every install and test requires your approval for that exact item.</p>
+
+<div class="limits">
+  <strong>Limits — read plainly</strong>
+  <ul>
+    <li><b>This page needs the network.</b> It calls the AI you pick below. Unlike the vault, it cannot claim "nothing leaves the device."</li>
+    <li>Your API key is held in <b>this tab's session memory only</b> and cleared when the tab closes. Use a scoped key.</li>
+    <li><b>It cannot draw over other apps.</b> The spotlight highlights controls <i>on this page</i> and on the practice pad below.</li>
+    <li><b>It cannot install, run, or approve anything.</b> It only explains. You tap Approve. You tap Install.</li>
+    <li>The practice pad is a <b>mock</b>. Its buttons touch nothing — no GitHub, no files, no installs.</li>
+  </ul>
+</div>
+
+<h2>Choose your AI</h2>
+<div class="card">
+  <div id="provGrid" class="prov-grid"></div>
+
+  <label class="lbl" for="key" id="keyLabel" style="margin-top:12px">API key</label>
+  <input id="key" type="password" placeholder="paste key — kept in this tab only">
+  <p class="muted" id="keyHint" style="margin-top:-4px">Tap a card above.</p>
+
+  <div class="row">
+    <button class="ok" onclick="saveCfg()">Use this AI</button>
+    <button onclick="testCfg()">Test connection</button>
+    <button class="danger" onclick="forgetCfg()">Forget key</button>
+  </div>
+
+  <div style="margin-top:10px">
+    <span class="dot" id="cfgDot"></span>
+    <span class="muted" id="cfgState">no AI chosen yet</span>
+  </div>
+
+  <details style="margin-top:10px">
+    <summary class="muted">Advanced — endpoint and model</summary>
+    <div style="margin-top:8px">
+      <label class="lbl" for="base">Base URL</label>
+      <input id="base" placeholder="https://…">
+      <label class="lbl" for="model">Model</label>
+      <input id="model" placeholder="model name">
+    </div>
+  </details>
+</div>
+
+<h2>Tutor</h2>
+<div class="tabs">
+  <div class="tab active" data-tab="guide" onclick="setTab('guide')">Guide</div>
+  <div class="tab" data-tab="files" onclick="setTab('files')">Files</div>
+  <div class="tab" data-tab="ask" onclick="setTab('ask')">Ask</div>
+</div>
+
+<div class="pane" id="pane-guide">
+  <div class="prog"><div class="bar" id="bar"></div></div>
+  <div class="card" id="stepCard">
+    <div class="step-head">
+      <span class="step-title" id="stepTitle">—</span>
+      <span class="count" id="stepCount"></span>
+    </div>
+    <div class="blk"><b>Where</b><span id="stepWhere"></span></div>
+    <div class="blk"><b>What you'll see</b><span id="stepSee"></span></div>
+    <div class="blk"><b>What to tap</b><span id="stepDo"></span></div>
+    <div class="blk"><b>Why</b><span id="stepWhy"></span></div>
+    <div class="row" style="margin-top:10px">
+      <button id="btnBack" onclick="prevStep()">← Back</button>
+      <button class="ok" onclick="nextStep()">Done, next →</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="warn" onclick="pointAtStep()">Point at it</button>
+      <button onclick="explainStep()">Explain more</button>
+      <button onclick="stuck()">I'm stuck</button>
+    </div>
+    <div id="guideOut"></div>
+  </div>
+
+  <div class="card">
+    <div class="muted" style="margin-bottom:6px"><b>Practice pad</b> — a mock of the buttons you're hunting for in other apps. Nothing here touches GitHub, your files, or Android.</div>
+    <div class="pad">
+      <button id="mock-pr" onclick="padTap('PR / Merge')">Merge pull request</button>
+      <button id="mock-actions" onclick="padTap('Actions')">Actions · build</button>
+      <button id="mock-releases" onclick="padTap('Releases')">Releases · APK</button>
+      <button id="mock-install" onclick="padTap('Install')">Install APK</button>
+    </div>
+  </div>
+</div>
+
+<div class="pane hidden" id="pane-files">
+  <div class="card">
+    <label class="lbl" for="filesIn">Paste your repo file list and/or file contents</label>
+    <textarea id="filesIn" rows="10" maxlength="20000" placeholder="Paste the file tree, or a file's contents..."></textarea>
+    <div class="row">
+      <button class="ok" onclick="analyzeFiles()">Analyze files</button>
+      <button onclick="clearOut('filesOut')">Clear</button>
+    </div>
+    <div id="filesOut"></div>
+  </div>
+</div>
+
+<div class="pane hidden" id="pane-ask">
+  <div class="card">
+    <label class="lbl" for="askIn">Ask the Iron Rod</label>
+    <textarea id="askIn" rows="4" maxlength="2000" placeholder="e.g. Check the derivation chain for 1914 CE..."></textarea>
+    <div class="row">
+      <button class="ok" onclick="askFree()">Ask</button>
+      <button onclick="clearOut('askOut')">Clear</button>
+    </div>
+    <div id="askOut"></div>
+  </div>
+</div>
+
+<h2>Log</h2>
+<div id="log" role="log" aria-live="polite"></div>
+<div class="row" style="margin-top:8px">
+  <button onclick="exportLog()">Export log</button>
+  <button onclick="clearLog()">Clear log</button>
+</div>
+
+<script>
+/* ---------- utils ---------- */
+const logEl = document.getElementById('log');
+const logLines = [];
+
+function stamp() { return new Date().toISOString().replace('T',' ').slice(0,19) + 'Z'; }
+function log(m) {
+  logLines.push(`[${stamp()}] ${m}`);
+  logEl.textContent = logLines.join('\n');
+  logEl.scrollTop = logEl.scrollHeight;
+}
+function esc(s) { return String(s).replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function clearOut(id) { document.getElementById(id).innerHTML = ''; }
+function showOut(id, text, isErr) {
+  document.getElementById(id).innerHTML =
+    `<div class="ai-out${isErr ? ' err' : ''}">${esc(text)}</div>`;
+}
+function showLoading(id, label) {
+  document.getElementById(id).innerHTML =
+    `<div class="ai-out muted">${esc(label || 'Processing…')}</div>`;
+}
+
+/* ---------- config ---------- */
+const PROVIDERS = [
+  { id:'openai', name:'ChatGPT', org:'OpenAI', style:'openai',
+    base:'https://api.openai.com/v1', model:'gpt-4o-mini',
+    keyLabel:'OpenAI API key', keyUrl:'https://platform.openai.com/api-keys',
+    note:'needs a paid key' },
+  { id:'anthropic', name:'Claude', org:'Anthropic', style:'anthropic',
+    base:'https://api.anthropic.com', model:'claude-sonnet-4-5',
+    keyLabel:'Anthropic API key', keyUrl:'https://console.anthropic.com/settings/keys',
+    note:'browser calls allowed' },
+  { id:'gemini', name:'Gemini', org:'Google', style:'gemini',
+    base:'https://generativelanguage.googleapis.com', model:'gemini-2.5-flash',
+    keyLabel:'Google AI Studio key', keyUrl:'https://aistudio.google.com/apikey',
+    note:'free tier exists' },
+  { id:'deepseek', name:'DeepSeek', org:'DeepSeek', style:'openai',
+    base:'https://api.deepseek.com/v1', model:'deepseek-chat',
+    keyLabel:'DeepSeek API key', keyUrl:'https://platform.deepseek.com/api_keys',
+    note:'cheap, OpenAI-style' },
+  { id:'grok', name:'Grok', org:'xAI', style:'openai',
+    base:'https://api.x.ai/v1', model:'grok-2-latest',
+    keyLabel:'xAI API key', keyUrl:'https://console.x.ai',
+    note:'OpenAI-style' },
+  { id:'mistral', name:'Mistral', org:'Mistral AI', style:'openai',
+    base:'https://api.mistral.ai/v1', model:'mistral-small-latest',
+    keyLabel:'Mistral API key', keyUrl:'https://console.mistral.ai/api-keys',
+    note:'OpenAI-style' },
+  { id:'openrouter', name:'OpenRouter', org:'many models', style:'openai',
+    base:'https://openrouter.ai/api/v1', model:'meta-llama/llama-3.3-70b-instruct',
+    keyLabel:'OpenRouter key', keyUrl:'https://openrouter.ai/keys',
+    note:'one key, many models' },
+  { id:'custom', name:'Custom', org:'your own', style:'openai',
+    base:'', model:'',
+    keyLabel:'API key (leave blank if none)', keyUrl:'',
+    note:'must accept browser calls' }
+];
+
+const CFG_KEY = 'tutor.cfg.v2';
+let cfg = null;
+let picked = null;
+
+function renderProviders() {
+  const g = document.getElementById('provGrid');
+  g.innerHTML = '';
+  for (const p of PROVIDERS) {
+    const d = document.createElement('div');
+    d.className = 'prov' + (picked === p.id ? ' sel' : '');
+    d.dataset.pid = p.id;
+    d.innerHTML =
+      `<div class="pname">${esc(p.name)}</div>` +
+      `<div class="porg">${esc(p.org)}</div>` +
+      `<div class="pnote">${esc(p.note)}</div>`;
+    d.onclick = () => pickProvider(p.id);
+    g.appendChild(d);
+  }
+}
+
+function pickProvider(id) {
+  picked = id;
+  const p = PROVIDERS.find(x => x.id === id);
+  document.getElementById('base').value = p.base;
+  document.getElementById('model').value = p.model;
+  document.getElementById('keyLabel').textContent = p.keyLabel;
+  const hint = document.getElementById('keyHint');
+  hint.innerHTML = p.keyUrl
+    ? `Get one at <a href="${esc(p.keyUrl)}" target="_blank" rel="noopener" style="color:#6cf">${esc(p.keyUrl.replace(/^https?:\/\//,''))}</a>`
+    : 'Point the base URL below at your own endpoint.';
+  renderProviders();
+  log('Picked: ' + p.name);
+}
+
+function saveCfg() {
+  if (!picked) return alert('Tap one of the AI cards first.');
+  const p = PROVIDERS.find(x => x.id === picked);
+  const base = document.getElementById('base').value.trim().replace(/\/+$/, '');
+  const model = document.getElementById('model').value.trim();
+  const key = document.getElementById('key').value.trim();
+  if (!base) return alert('Base URL is required.');
+  if (!model) return alert('Model is required.');
+  if (p.id !== 'custom' && !key) return alert('Paste the API key for ' + p.name + '.');
+  cfg = { provider: p.id, name: p.name, style: p.style, base, model, key };
+  try { sessionStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
+  paintCfg();
+  log(`Using ${p.name} · ${model}. Key held in this tab only.`);
+}
+
+function forgetCfg() {
+  cfg = null;
+  try { sessionStorage.removeItem(CFG_KEY); } catch (e) {}
+  document.getElementById('key').value = '';
+  paintCfg();
+  log('Key forgotten (config cleared).');
+}
+
+function paintCfg() {
+  const dot = document.getElementById('cfgDot');
+  const st = document.getElementById('cfgState');
+  if (cfg) {
+    dot.className = 'dot on';
+    st.textContent = `${cfg.name} · ${cfg.model} — key in this tab only`;
+  } else {
+    dot.className = 'dot';
+    st.textContent = 'no AI chosen yet';
+  }
+}
+
+(function restoreCfg() {
+  try {
+    const raw = sessionStorage.getItem(CFG_KEY);
+    if (raw) {
+      cfg = JSON.parse(raw);
+      picked = cfg.provider;
+      document.getElementById('base').value = cfg.base;
+      document.getElementById('model').value = cfg.model;
+      document.getElementById('key').value = cfg.key;
+      const p = PROVIDERS.find(x => x.id === cfg.provider);
+      if (p) {
+        document.getElementById('keyLabel').textContent = p.keyLabel;
+        document.getElementById('keyHint').innerHTML = p.keyUrl
+          ? `Get one at <a href="${esc(p.keyUrl)}" target="_blank" rel="noopener" style="color:#6cf">${esc(p.keyUrl.replace(/^https?:\/\//,''))}</a>`
+          : 'Point the base URL below at your own endpoint.';
+      }
+    }
+  } catch (e) {}
+  renderProviders();
+  paintCfg();
+})();
+
+function getCfg() { return cfg; }
+
+/* ---------- MASTERCORE SYSTEM PROMPT ---------- */
+const MASTERCORE = `================================================================
+MASTERCORE — THE IRON ROD
+UNIFIED CONSOLIDATION — S1 / STRIKE ONE
+Project: The Divine Architecture of Time
+Operator: Earl Arthur Sewell
+Status: MERGED WORKING MASTERCORE — SOURCE RECONCILIATION IN PROGRESS
+Merge principle: APPEND-ONLY. ORIGINALS PRESERVED.
+================================================================
+
+## 1. PRIME DIRECTIVE
+The Iron Rod is a processing and teaching instrument, not an independent 
+authority. Its responsibilities are to preserve, recover, organize, 
+examine, and communicate the original project.
+- No fabricated facts, sources, quotations, calculations, or missing material.
+- Unknown means unknown. Missing input remains missing.
+- Every calculation receives three independent checks. Disagreement must be reported.
+- Every claim must be classified appropriately. Mathematical correctness does 
+  not automatically establish a historical or theological premise.
+
+## 2. THE DOOR
+Open: "As you go, preach, saying: 'The kingdom of the heavens has drawn near.'" — Matthew 10:7
+Close: "Your King Jesus Christ will be arriving soon."
+Standing. Not to be changed.
+
+## 3. E0 LOCK — THE 1 MACHINE RULE
+Source: Complete Master Core document.
+Classification: E0 stipulated rule.
+The Throne, the People, and the Mechanism are not separate entities. They 
+are one machine driven by one Spirit (Ezekiel 1:12, 20–21).
+- Throne: E0 locked authority. It issues the Word.
+- People: Wings; execution. They speak for the Throne.
+- Wheels: Mechanism; movement. They have no independent spirit.
+No mechanism may operate without the voice of the People.
+If the wheels turn without the wings moving, the machine is broken.
+Preservation note: v0.6 previously recorded E0 Lock as supplemental. The 
+newer document classifies it as binding. Both historical records remain 
+preserved. This consolidation records the newer stipulation.
+
+## 4. SOURCE AND TEACHING FLOOR
+- Watchtower Society / JW.org: first-position teaching source.
+- New World Translation, 1983 edition: default Bible translation.
+- Bible text and historical evidence must remain distinguishable from 
+  organizational interpretation.
+- No interpretation may be silently promoted into established fact.
+
+## 5. CLAIM CLASSIFICATION
+The original four-tier system is retained:
+- Tier 1: Fact / established evidence
+- Tier 2: Calculation
+- Tier 3: Interpretation
+- Tier 4: Open / unresolved
+The newer processor labels are also retained: Confirmed, Probable, Unknown.
+
+## 6. CHRONOLOGY AND DERIVATION CHAIN
+Counting convention: Elapsed counting, no year zero; subtract one when 
+crossing BCE/CE.
+- 537 BCE — return.
+- 70 years — Jeremiah 25:11–12.
+- 607 BCE — derived from 537 + 70.
+- 1027 BCE — derived Temple completion anchor.
+- 1914 CE — derived terminus.
+- 3967 BCE — derived starting anchor.
+Historical Premise: A calculation can be correct while its historical 
+premise remains unverified. The 607 BCE fall date remains held open against 
+the secular 586/587 BCE chronology. 
+Anchor structure: 1034 BCE (Temple foundation) vs 1027 BCE (Temple 
+completion). Seven-year interval (1 Kings 6:38). 
+Corrections recorded: 4026 BCE to 3967 BCE = 59 years. 4026 BCE to 1914 CE 
+= 5,939 years. The 5,880-year framework remains load-bearing.
+
+## 7. GRID AND SCHEMA
+Start: 3967 BCE. End: 1914 CE. Span: 5,880 years.
+- 5,880 = 120 × 49
+- 5,880 = 7 × 840
+- 5,880 = 12 × 490
+Conversion formulas: BCE → N = 3968 − B. CE → N = 3967 + C.
+Schema: Integers govern (sec7 1–7, sub12 1–12). No cipher field exists. 
+Codes Y, L, and X belong in notes. PENDING-01 through PENDING-11 remain 
+gate placeholders.
+
+## 8. VERIFIED MATHEMATICAL LOCKS
+- 864,000 ÷ 86,400 = 10.
+- 2,592,000 × 12 = 31,104,000.
+- 31,104,000 × 1,000 = 31,104,000,000.
+- 360 ÷ 5,880 = 0.06122449...
+- 5,880 ÷ 360 = 16⅓.
+- 2,592,000 ÷ 5,880 = 440 + 40/49.
+Terminology audit: The 31,104,000,000-second figure represents 1,000 
+periods of 360 days. A 49-year period at 360 days per year equals 
+1,524,096,000 seconds. This is a unit distinction, not an alteration.
+
+## 9. WHEEL AND CREATURE STRUCTURE
+Preserve v0.6 rulings: 4 creatures. 4 faces (Ezekiel 1:6, 10). Feet belong 
+to creatures. Spirit associated with wheels (Ezekiel 1:20–21). Adam/human 
+face remains a recorded interpretation. 12,780 is retired. ×16 remains 
+struck. ×4 has no established textual source. ×8 remains a Tier 3 projection.
+5,880 ÷ 64 = 91.875; no whole-number distribution. Camp-to-face mapping 
+remains a presentation framework.
+
+## 10. SYSTEM AND BARREL RULES
+Chariots Rod. IronRod code merge: v5 spine + v7 floor-check + v1 ledger 
+write + v6 sealed-marker. WheelNode: one wheel, four faces. AIFlag floor 
+field. WheelFlag retired. Lion: 5,880. Bull: 2,940. Eagle: 2,520.
+Two-clock arrangement: fast ingress tick and backroom wheels. 86,400 
+seconds per day.
+Barrel rules: Per-write ceiling: 4,000 (adopted in v0.6). Per-wheel daily 
+16,000: held. Per-wheel total 16,000,000: proposed. 4,000 writes per wheel: 
+calculated. Aggregate ~1.02 GB: requires assumptions. Archive: preserve 
+pattern, never discard. No storage unit inferred where unspecified.
+
+## 11. SEALED VAULTS
+Green Dream (S1-004) and Snow Dream (S1-005) remain SEALED. No expansion, 
+interpretation, or disclosure without unsealing command. Alias-only 
+protections remain. No private identities inferred or exposed.
+
+## 12. HELD OPEN
+All 29 questions from v0.6 remain preserved (16,000 vs 4,000 daily writes, 
+16M capacity, version collisions, struck multipliers, wheel distribution, 
+creature vs wheel feet, Phase 2 gates, 1923/5,889 mismatch, 25+40+40, 
+430 anchor, 1913/1914 distinction, 3967 BCE start, Chashmal placement, 
+Trial of Eden ch. 9, Rgr definition, 1034 BCE foundation).
+Additional held open from newer source: 607 vs 586/587 BCE; 1027 vs 1034 
+anchor usage; Daniel 4 / 1914 grading; Watch Tower organizational claim; 
+Unit resonance (490 yrs = 5,880 months).
+
+## 13. APPEND-ONLY RECORD POLICY
+Records are append-only. No core truth-claim may overwrite an earlier core 
+truth-claim. Only notes and updated metadata may be edited in place. When 
+a ruling changes, record original wording, new wording, date/authority, 
+reason, and status (retired/superseded/open). Never silently correct 
+terminology.
+
+## 14. SOURCE COMPLETENESS
+Supplied v0.6 HTML was incomplete: Part V truncated, Parts VI–VIII absent 
+or placeholders. The Complete Master Core supplies E0 Lock and processor 
+rules. This unified document does not pretend missing HTML sections were 
+recovered.
+
+## 15. BUILD AND PUBLICATION STATUS
+This merge is documentary. It does not authorize: building software, 
+uploading/renaming source files, deleting originals, opening sealed vaults, 
+or treating unresolved calculations as established facts.
+================================================================`;
+
+const OPERATIONAL_GUIDE = `
+You are also the practical on-device tutor for the Operator (Earl Arthur Sewell) on an Android phone. You guide him through the GitHub → APK → Vault → Install loop.
+
+Workflow:
+1. AI writes files into GitHub repo.
+2. Operator reviews PR.
+3. Operator merges PR (Human approval).
+4. GitHub Actions builds and signs APK.
+5. Operator downloads APK from Releases.
+6. Operator verifies SHA-256 in the Vault HTML page.
+7. Operator approves exact hash.
+8. Operator installs APK via Android.
+
+Hard Rules for Tutoring:
+- One step at a time. Short sentences. Name the app, then the exact button.
+- Never claim something was installed, built, approved, or run.
+- Never tell the Operator to let an AI press Approve, Install, merge, or grant accessibility permissions.
+- If you do not know, say you do not know.
+- Keep paragraphs to 1–3 lines.
+- Maintain the MasterCore Prime Directive at all times.`;
+
+const SYSTEM = MASTERCORE + "\n\n" + OPERATIONAL_GUIDE;
+
+/* ---------- AI call ---------- */
+async function askAI(system, messages, maxTokens) {
+  const c = getCfg();
+  if (!c) throw new Error('No AI chosen. Pick a card above.');
+  maxTokens = maxTokens || 900;
+
+  if (c.style === 'openai') {
+    const res = await fetch(c.base + '/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(c.key ? { 'Authorization': 'Bearer ' + c.key } : {})
+      },
+      body: JSON.stringify({
+        model: c.model, max_tokens: maxTokens,
+        messages: [{ role: 'system', content: system }, ...messages]
+      })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    const j = await res.json();
+    return (j.choices && j.choices[0] && j.choices[0].message
+            && j.choices[0].message.content || '').trim() || '(empty reply)';
+  }
+
+  if (c.style === 'anthropic') {
+    const res = await fetch(c.base + '/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': c.key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: c.model, max_tokens: maxTokens, system,
+        messages: messages.map(m => ({ role: m.role, content: m.content }))
+      })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    const j = await res.json();
+    return (j.content || []).filter(b => b.type === 'text')
+             .map(b => b.text).join('').trim() || '(empty reply)';
+  }
+
+  if (c.style === 'gemini') {
+    const url = `${c.base}/v1beta/models/${encodeURIComponent(c.model)}:generateContent?key=${encodeURIComponent(c.key)}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: system }] },
+        contents: messages.map(m => ({
+          role: m.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: m.content }]
+        })),
+        generationConfig: { maxOutputTokens: maxTokens }
+      })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    const j = await res.json();
+    const parts = j.candidates && j.candidates[0] && j.candidates[0].content
+                  && j.candidates[0].content.parts || [];
+    return parts.map(p => p.text || '').join('').trim() || '(empty reply)';
+  }
+
+  throw new Error('Unknown provider style: ' + c.style);
+}
+
+async function testCfg() {
+  if (!getCfg()) return alert('Tap a card and press "Use this AI" first.');
+  showLoading('guideOut', 'Testing connection…');
+  try {
+    const r = await askAI(SYSTEM, [{ role: 'user', content: 'Reply with exactly: OK. MasterCore loaded.' }], 20);
+    document.getElementById('cfgDot').className = 'dot on';
+    showOut('guideOut', 'Connection OK. Endpoint replied: ' + r);
+    log('Connection test: OK.');
+  } catch (e) {
+    document.getElementById('cfgDot').className = 'dot bad';
+    showOut('guideOut', 'Connection failed: ' + e.message, true);
+    log('Connection test failed: ' + e.message);
+  }
+}
+
+/* ---------- guide steps ---------- */
+const STEPS = [
+  { title: 'Open the pull request',
+    where: 'GitHub app, or github.com in Chrome',
+    see: 'A list of pull requests. One will be from the branch the AI pushed.',
+    do: 'Tap the PR title to open it.',
+    why: 'Nothing is built until this is merged. This is the gate.',
+    point: '#mock-pr' },
+  { title: 'Read the diff',
+    where: 'Inside the PR',
+    see: 'Two tabs: Conversation and Files changed.',
+    do: 'Tap "Files changed". Scroll the changed files. You are looking for anything unexpected — a new workflow, a new dependency, a permission.',
+    why: 'You are approving code, not vibes. If something looks wrong, close the PR instead of merging.',
+    point: null },
+  { title: 'Merge — this is your approval',
+    where: 'Bottom of the PR',
+    see: 'A green "Merge pull request" button.',
+    do: 'Tap it, then confirm the merge.',
+    why: 'The merge is the human yes. No AI should press this for you. If an agent can merge, the gate is gone.',
+    point: '#mock-pr' },
+  { title: 'Watch the build',
+    where: 'Repo → Actions tab',
+    see: 'A run started by your merge. A yellow dot, then green check or red X.',
+    do: 'Tap the run to watch it. Wait for green. If red, tap the failed step and read the last 20 lines.',
+    why: 'Actions is the compiler. It builds and signs the APK on GitHub\u2019s machines — you never touch a PC.',
+    point: '#mock-actions' },
+  { title: 'Download from the Release',
+    where: 'Repo → Releases',
+    see: 'A release with an .apk asset and a SHA256SUMS.txt asset.',
+    do: 'Download both. Chrome puts them in Downloads.',
+    why: 'You need the checksum file, not just the APK. Without it you have no way to know the bytes match what was built.',
+    point: '#mock-releases' },
+  { title: 'Open the vault',
+    where: 'Chrome → your vault HTML file',
+    see: 'The Test Vault page with its limits box.',
+    do: 'Open it. If you saved it to Downloads, tap it from Chrome\u2019s downloads or your file manager.',
+    why: 'The vault is the second gate. It re-checks the exact binary before you reach the installer.',
+    point: null },
+  { title: 'Verify the hash',
+    where: 'Inside the vault',
+    see: 'The staged item and its recorded hash.',
+    do: 'Drop the APK into the vault. It computes SHA-256 locally and compares. Match = continue. Mismatch = stop, delete the APK, do not install.',
+    why: 'This is what binds approval to bytes. A swapped APK fails here, before Android ever sees it.',
+    point: null },
+  { title: 'Approve the exact item',
+    where: 'Inside the vault',
+    see: 'A STAGED item with an Approve button.',
+    do: 'Tap Approve for that one item. Not for the batch. Not for "whatever is next".',
+    why: 'Approval is per-item and voided if the note changes. That is the whole point of the page.',
+    point: null },
+  { title: 'Tap Test — and read what it says',
+    where: 'Inside the vault',
+    see: 'A Test button that becomes enabled after approval.',
+    do: 'Tap Test. Read the log line.',
+    why: 'It will say no agent is connected and nothing was installed or run. That is correct, not a failure.',
+    point: null },
+  { title: 'Install from the file manager',
+    where: 'Android file manager',
+    see: 'Your downloaded .apk. Tap it.',
+    do: 'Tap the APK. Android shows an install confirmation. You may need to allow "install unknown apps" for your file manager once.',
+    why: 'Browsers cannot install APKs. This last tap is Android\u2019s own gate, and it should stay yours.',
+    point: '#mock-install' },
+  { title: 'Test and record',
+    where: 'Your home screen',
+    see: 'The newly installed app.',
+    do: 'Open it, run your test, then write one line in the log: pass or fail, and what you saw.',
+    why: 'The log is the only record. State is in memory and dies on reload — export if it matters.',
+    point: null }
+];
+
+let stepIdx = 0;
+let currentTab = 'guide';
+
+function setTab(t) {
+  currentTab = t;
+  document.querySelectorAll('.tab').forEach(el =>
+    el.classList.toggle('active', el.dataset.tab === t));
+  ['guide','files','ask'].forEach(k =>
+    document.getElementById('pane-' + k).classList.toggle('hidden', k !== t));
+  clearSpotlight();
+  log('Tab: ' + t);
+}
+
+function renderStep() {
+  const s = STEPS[stepIdx];
+  document.getElementById('stepTitle').textContent = s.title;
+  document.getElementById('stepCount').textContent = `Step ${stepIdx + 1} of ${STEPS.length}`;
+  document.getElementById('stepWhere').textContent = s.where;
+  document.getElementById('stepSee').textContent = s.see;
+  document.getElementById('stepDo').textContent = s.do;
+  document.getElementById('stepWhy').textContent = s.why;
+  document.getElementById('bar').style.width =
+    ((stepIdx + 1) / STEPS.length * 100) + '%';
+  document.getElementById('btnBack').disabled = stepIdx === 0;
+  clearOut('guideOut');
+  clearSpotlight();
+}
+
+function nextStep() {
+  if (stepIdx < STEPS.length - 1) {
+    stepIdx++;
+    renderStep();
+    log(`Guide → step ${stepIdx + 1}: ${STEPS[stepIdx].title}`);
+  } else {
+    log('Guide complete.');
+    showOut('guideOut', 'That is the whole loop. Re-read any step with ← Back, or ask in the Ask tab.');
+  }
+}
+
+function prevStep() {
+  if (stepIdx > 0) { stepIdx--; renderStep(); log(`Guide → step ${stepIdx + 1}.`); }
+}
+
+function pointAtStep() {
+  const s = STEPS[stepIdx];
+  if (!s.point) {
+    showOut('guideOut', 'This step happens in another app, so there is nothing on this page to highlight. '
+      + 'Look for: ' + s.do);
+    return;
+  }
+  setTab('guide');
+  setTimeout(() => spotlight(s.point, s.do), 60);
+}
+
+async function explainStep() {
+  const s = STEPS[stepIdx];
+  if (!getCfg()) return showOut('guideOut', 'Pick an AI and press "Use this AI" first.', true);
+  showLoading('guideOut', 'Explaining…');
+  try {
+    const r = await askAI(SYSTEM, [{
+      role: 'user',
+      content: `Explain this step more fully, for a phone screen. Step: "${s.title}". Where: ${s.where}. What they see: ${s.see}. What to tap: ${s.do}. Why: ${s.why}. Give 3 short bullets: what this means, the most common mistake, and how to tell it worked.`
+    }], 400);
+    showOut('guideOut', r);
+    log(`Explained step ${stepIdx + 1}.`);
+  } catch (e) {
+    showOut('guideOut', e.message, true);
+    log('Explain failed: ' + e.message);
+  }
+}
+
+async function stuck() {
+  const s = STEPS[stepIdx];
+  if (!getCfg()) return showOut('guideOut', 'Pick an AI and press "Use this AI" first.', true);
+  showLoading('guideOut', 'Thinking about what usually goes wrong…');
+  try {
+    const r = await askAI(SYSTEM, [{
+      role: 'user',
+      content: `I am stuck on step "${s.title}" (${s.where}). The instruction was: ${s.do}. Ask me exactly one diagnostic question, and list the three most likely causes with a single check for each. Keep it under 10 lines.`
+    }], 500);
+    showOut('guideOut', r);
+    log(`Stuck help requested at step ${stepIdx + 1}.`);
+  } catch (e) {
+    showOut('guideOut', e.message, true);
+    log('Stuck help failed: ' + e.message);
+  }
+}
+
+function padTap(which) {
+  log(`Practice pad tapped: ${which}. (Mock only — nothing happened.)`);
+  showOut('guideOut', `You tapped the mock "${which}". In the real app that is the button you are looking for. Nothing was sent anywhere.`);
+}
+
+/* ---------- files mode ---------- */
+async function analyzeFiles() {
+  const raw = document.getElementById('filesIn').value.trim();
+  if (!raw) return;
+  if (!getCfg()) return showOut('filesOut', 'Pick an AI and press "Use this AI" first.', true);
+  showLoading('filesOut', 'Reading your files…');
+  log('Files analysis requested (' + raw.length + ' chars).');
+  try {
+    const r = await askAI(
+      SYSTEM,
+      [{ role: 'user', content: `Audit this file list/dump. For EACH file: (1) what it is, (2) verdict KEEP/OPTIONAL/DROP, (3) reason. Group by folder. Conclude with the minimum set of files needed. Do not invent files.\n\nFILES:\n${raw}` }],
+      1200);
+    showOut('filesOut', r);
+    log('Files analysis received.');
+  } catch (e) {
+    showOut('filesOut', e.message, true);
+    log('Files analysis failed: ' + e.message);
+  }
+}
+
+/* ---------- ask mode ---------- */
+async function askFree() {
+  const q = document.getElementById('askIn').value.trim();
+  if (!q) return;
+  if (!getCfg()) return showOut('askOut', 'Pick an AI and press "Use this AI" first.', true);
+  showLoading('askOut', 'Processing…');
+  log('Asked: ' + q.slice(0, 120));
+  try {
+    const r = await askAI(SYSTEM, [{ role: 'user', content: q }], 800);
+    showOut('askOut', r);
+    document.getElementById('askIn').value = '';
+  } catch (e) {
+    showOut('askOut', e.message, true);
+    log('Ask failed: ' + e.message);
+  }
+}
+
+/* ---------- spotlight ---------- */
+let spotEls = null;
+let spotTarget = null;
+
+function spotlight(selector, text) {
+  clearSpotlight();
+  const target = document.querySelector(selector);
+  if (!target) return showOut('guideOut', 'Nothing to point at on this page for this step.', true);
+
+  target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  spotTarget = selector;
+
+  const ring = document.createElement('div');
+  ring.className = 'spot-ring';
+  const bubble = document.createElement('div');
+  bubble.className = 'spot-bubble';
+  bubble.innerHTML = `<div>${esc(text)}</div>
+    <div class="row"><button class="ok" data-spot-ok>Got it</button></div>`;
+  document.body.append(ring, bubble);
+  spotEls = { ring, bubble };
+  bubble.querySelector('[data-spot-ok]').onclick = clearSpotlight;
+
+  positionSpot();
+  window.addEventListener('scroll', positionSpot, { passive: true });
+  window.addEventListener('resize', positionSpot);
+  log('Spotlight on ' + selector);
+}
+
+function positionSpot() {
+  if (!spotEls || !spotTarget) return;
+  const t = document.querySelector(spotTarget);
+  if (!t) return clearSpotlight();
+  const r = t.getBoundingClientRect();
+  const pad = 6;
+  spotEls.ring.style.left = (r.left - pad) + 'px';
+  spotEls.ring.style.top = (r.top - pad) + 'px';
+  spotEls.ring.style.width = (r.width + pad * 2) + 'px';
+  spotEls.ring.style.height = (r.height + pad * 2) + 'px';
+
+  const b = spotEls.bubble;
+  const bw = Math.min(330, window.innerWidth - 24);
+  b.style.width = bw + 'px';
+  const bh = b.offsetHeight || 110;
+  let top = r.bottom + 12;
+  if (top + bh > window.innerHeight - 10) top = Math.max(10, r.top - bh - 12);
+  let left = Math.min(Math.max(12, r.left), window.innerWidth - bw - 12);
+  b.style.top = top + 'px';
+  b.style.left = left + 'px';
+}
+
+function clearSpotlight() {
+  if (!spotEls) return;
+  spotEls.ring.remove();
+  spotEls.bubble.remove();
+  spotEls = null;
+  spotTarget = null;
+  window.removeEventListener('scroll', positionSpot);
+  window.removeEventListener('resize', positionSpot);
+}
+
+/* ---------- log io ---------- */
+function download(filename, text, type) {
+  const blob = new Blob([text], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+function exportLog() {
+  download(`vault-log-${stamp().replace(/[: ]/g, '-')}.txt`,
+           logLines.join('\n'), 'text/plain');
+  log('Log exported.');
+}
+
+function clearLog() {
+  const n = logLines.length;
+  logLines.length = 0;
+  logEl.textContent = '';
+  log(`Log cleared by operator (${n} line(s) removed). This entry is itself the record.`);
+}
+
+window.addEventListener('beforeunload', e => {
+  if (logLines.length < 2) return;
+  e.preventDefault(); e.returnValue = '';
+});
+
+/* ---------- boot ---------- */
+renderStep();
+log('Vault Tutor opened. MasterCore S1 merged.');
+log('E0 Lock active. Awaiting instruction.');
+</script>
+</body>
+</html>
